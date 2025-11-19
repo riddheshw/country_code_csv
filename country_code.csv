@@ -1,0 +1,907 @@
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+Practical 1:  Creating Data Model using Cassandra.
+
+Step1  -    open docker desktop app
+          If docker engine no started then update wsl for enable linux
+
+Step 2   -   search for cassandra (eye icon) > click on pull > then run > give container name > type port no as it is for all fields then simply run
+
+Step 3 - now go to exec option > in this terminal type cqlsh (this connects your containers to cassandra database)
+
+
+Step 4  -
+
+Create a Keyspace :
+
+cqlsh> Create keyspace keyspace1 with replication={'class':'SimpleStrategy','replication_factor':3};
+
+Creating Tables for Department and Employee :
+
+cqlsh> use keyspace1;
+
+cqlsh:keyspace1> create table dept(dept_ID int PRIMARY KEY, dept_name text, dept_loc text);
+cqlsh:keyspace1> create table emp(emp_ID int PRIMARY KEY, emp_name text, dept_id int, Email text, Phone text);
+
+Inserting Data Into the Tables :
+Department :
+
+cqlsh:keyspace1> insert into dept(dept_ID, dept_name, dept_loc) VALUES (1001, 'Science', 'Mumbai');
+cqlsh:keyspace1> insert into dept(dept_ID, dept_name, dept_loc) VALUES (1011, 'Psychology', 'Hyderabad');
+cqlsh:keyspace1> insert into dept(dept_ID, dept_name, dept_loc) VALUES (1111, 'Zoology', 'Chennai');
+
+Employee :
+
+cqlsh:keyspace1> insert into emp(emp_ID, emp_name, dept_id, Email, Phone) VALUES (0001, 'Harshal', 1001, 'harshal@gmail.com', '9999666777');
+cqlsh:keyspace1> insert into emp(emp_ID, emp_name, dept_id, Email, Phone) VALUES (0002, 'Jhonny', 1001, 'Jhonny@gmail.com', '9999666678');
+cqlsh:keyspace1> insert into emp(emp_ID, emp_name, dept_id, Email, Phone) VALUES (0003, 'Jordi', 1011, 'Jordi@gmail.com', '9999666675');
+cqlsh:keyspace1> insert into emp(emp_ID, emp_name, dept_id, Email, Phone) VALUES (0004, 'Aditya', 1011, 'Aditya@gmail.com', '9999666777');
+cqlsh:keyspace1> insert into emp(emp_ID, emp_name, dept_id, Email, Phone) VALUES (0005, 'Pawan', 1111, 'Pawan@gmail.com', '9999663677');
+cqlsh:keyspace1> insert into emp(emp_ID, emp_name, dept_id, Email, Phone) VALUES (0006, 'Rehan', 1111, 'Rehan@gmail.com', '9999661677');
+
+
+
+Tables created for :
+
+Department
+cqlsh:keyspace1> select * from emp;
+
+
+Employee:
+cqlsh:keyspace1> select * from dept;
+
+
+Updating the dept Table  :
+cqlsh:keyspace1> update dept set dept_name='Marvel' where dept_ID=1001;
+cqlsh:keyspace1> select * from dept;
+
+
+Deletion in emp Table:
+cqlsh:keyspace1> delete from emp where emp_ID=3;
+cqlsh:keyspace1> select * from emp;
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+Practical 2
+
+Write a python program to convert from the following formats to HORUS format.
+
+a) Text delimited to HORUS : 
+## VKHCG github search > 05 ds > 999 > Country_Code.csv and HORUS-CSV-Country.csv
+
+import pandas as pd
+
+sInputFileName = r'C:\Users\Asus\Desktop\msc ds pra\Country_Code.csv'
+InputData = pd.read_csv(sInputFileName, encoding='latin-1')
+
+print('Input Data Values ================================')
+print(InputData)
+
+ProcessData = InputData.copy()
+
+ProcessData.drop('ISO-2-CODE', axis=1, inplace=True)
+ProcessData.drop('ISO-3-Code', axis=1, inplace=True)
+
+ProcessData.rename(columns={
+    'Country': 'CountryName',
+    'ISO-M49': 'CountryNumber'
+}, inplace=True)
+
+ProcessData.set_index('CountryNumber', inplace=True)
+ProcessData.sort_index(ascending=False, inplace=True)
+
+print('Processed Data Values ============================')
+print(ProcessData)
+
+OutputData = ProcessData
+
+sOutputFileName = r'C:\Users\Asus\Desktop\msc ds pra\HORUS-CSV-Country.csv'
+OutputData.to_csv(sOutputFileName)
+
+print('CSV to HORUS - Done')
+
+
+
+C) JSON to HORUS format
+## VKHCG github search > 05 ds > 999 > Country_Code.json and HORUS-JSON-Country.csv
+
+
+import pandas as pd
+
+sInputFileName=r'C:\Users\Asus\Desktop\msc ds pra\Country_Code.json'
+InputData=pd.read_json(sInputFileName, orient='index', encoding="latin-1")
+
+print('Input Data Values ================================')
+print(InputData)
+
+ProcessData=InputData
+
+ProcessData.drop('ISO-2-CODE', axis=1, inplace=True)
+ProcessData.drop('ISO-3-Code', axis=1, inplace=True)
+
+ProcessData.rename(columns={'Country': 'CountryName'}, inplace=True)
+ProcessData.rename(columns={'ISO-M49': 'CountryNumber'}, inplace=True)
+
+ProcessData.set_index('CountryNumber', inplace=True)
+
+ProcessData.sort_values('CountryName', axis=0, ascending=False, inplace=True)
+print('Process Data Values ================================')
+print(ProcessData)
+
+OutputData=ProcessData
+
+sOutputFileName=r'C:\Users\Asus\Desktop\msc ds pra\HORUS-JSON-Country.csv'
+OutputData.to_csv(sOutputFileName, index = False)
+
+print('JSON to HORUS - Done')
+
+
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+ Practical 4
+
+0) Create Sample Dataset.
+Code :
+ip_data_sample <- data.frame(
+ID = c("ID001", "ID002", "ID003", "ID004", "ID005"),
+IP_Address = c("192.168.1.1", "203.0.113.10", "10.0.0.5", "172.16.31.40", "198.51.100.22"),
+Country = c("USA", "Germany", "Canada", "USA", "Japan"),
+Latitude = c(40.7128, 52.5200, 43.6532, 41.8781, 35.6895),
+Longitude = c(-74.0060, 13.4050, -79.3832, -87.6298, 139.6917),
+`Place Name` = c("New York", "Berlin", "Toronto", "Chicago", "Tokyo"),
+`Test IP Number` = c(3232235777, 3405803786, 167772165, 2886755112, 3325256726),
+`Last IP Number` = c(3232235778, 3405803787, 167772166, 2886755113, 3325256727),
+check.names = FALSE
+)
+write.csv(ip_data_sample, "IP_DATA_ALL_Harshal.csv", row.names = FALSE)
+print("Sample file 'IP_DATA_ALL_Harshal.csv' has been created successfully.")
+
+
+1) Loading Dataset using R.
+Code :
+# Load the tidyverse library
+library(tidyverse)
+ip_data_all <- read_csv( "IP_DATA_ALL.csv",
+col_types = cols(ID = col_character(),
+IP_Address = col_character(),
+Country = col_character(),
+Latitude = col_double(),
+Longitude = col_double(),
+`Place Name` = col_character(),
+`Test IP Number` = col_double(),
+`Last IP Number` = col_double()
+)
+)
+print(ip_data_all)
+
+2) Retrieve Different Attributes of Data
+Code :
+View(ip_data_all)
+cat("\n--- Data Structure -\n")
+str(ip_data_all)
+cat("\n\n--- Statistical Summary ---\n")
+summary(ip_data_all)
+
+cat("\n\n--- Column Names ---\n")
+print(colnames(ip_data_all))
+
+
+3) (a) Identify and Fix Data Patterns (Problematic Column Names)
+Code :
+spec(ip_data_all)
+
+3) (b) Fix the problematic column names
+Code :
+library(janitor)
+ip_data_all_clean <- clean_names(ip_data_all)
+cat("\n\n--- Cleaned Column Names ---\n")
+print(colnames(ip_data_all_clean))
+cat("\n\n--- Data Frame with Cleaned Names ---\n")
+print(ip_data_all_clean)
+
+
+4) Exploring Data Patterns (Additional Analysis)
+Code :
+# Pattern 1: Frequency count of data points by country
+cat("\n\n--- Frequency Count by Country ---\n")
+country_summary <- ip_data_all_clean %>% count(country, sort = TRUE) 
+print(country_summary)
+
+# Pattern 2: Find the average Latitude and Longitude for each country
+cat("\n\n--- Average Location by Country ---\n")
+location_summary <- ip_data_all_clean %>% group_by(country) %>% summarise(average_latitude = mean(latitude),average_longitude = mean(longitude), record_count = n())
+print(location_summary)
+
+# Pattern 3: Visualize the number of IP addresses per country
+ggplot(data = country_summary, aes(x = country, y = n, fill = country)) + geom_bar(stat = "identity") + labs(title ="Number of IP Addresses by Country", x = "Country", y = "Count") +theme_minimal()
+
+
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+Practical-5
+
+5.1)))))). Perform error management on the given data using pandas package 
+# Input:
+# pip install pandas
+
+import pandas as pd
+import io
+print("--- Practical 1: Error Management with Pandas ---")
+# --- 2. Load Data ---
+try:
+    df = pd.read_csv('sample1.csv')
+
+except FileNotFoundError:
+    print("Error: 'sample1.csv' not found. Please create it first.")
+    df = pd.read_csv(io.StringIO(data))
+    print("\nLoaded fallback data for demonstration.")
+    print(df)
+
+# --- 3. Data Cleaning and Error Handling ---
+# Create a copy to preserve the original dataframe
+df_cleaned = df.copy()
+print("\n--- Starting Data Cleaning Process ---")
+# a Handling Missing Values (NaN).
+if 'age' in df_cleaned.columns:
+    # First, convert 'age' to a numeric type, coercing errors to NaN
+    df_cleaned['age'] = pd.to_numeric(df_cleaned['age'], errors='coerce')
+    median_age = df_cleaned['age'].median()
+    df_cleaned['age'].fillna(median_age, inplace=True)
+    print(f"\nStep 1: Filled missing 'age' values with median age ({median_age}).")
+
+# b Correcting Data Types
+df_cleaned['age'] = df_cleaned['age'].astype(int)
+df_cleaned['signup_date'] = pd.to_datetime(df_cleaned['signup_date'], errors='coerce')
+print("Step 2: Corrected data types for 'age' (to int) and 'signup_date' (to datetime).")
+
+# c Removing Duplicate Rows
+initial_rows = len(df_cleaned)
+df_cleaned.drop_duplicates(inplace=True)
+final_rows = len(df_cleaned)
+print(f"Step 3: Removed {initial_rows - final_rows} duplicate row(s).")
+
+# --- 4. Display Cleaned Data ---
+print("\n--- Data After Cleaning ---")
+print(df_cleaned)
+print("\nCleaned Data Info:")
+df_cleaned.info()
+print("\n--- Error Management Practical Complete ---")
+
+
+
+
+5.2))))) Write python/R program to create the network routing diagram from the given data on routers  
+# Input:
+# pip install networkx
+# pip3 install networkx
+# -m pip intall networkx
+# -m pip show networkx
+
+import pandas as pd
+import networkx as nx
+import matplotlib.pyplot as plt
+print("--- Practical 2: Network Routing Diagram ---")
+
+# --- 2. Load Data ---
+try:
+    df = pd.read_csv('sample2.csv')
+    print("Loaded Router Data:")
+    print(df)
+except FileNotFoundError:
+    print("Error: 'sample2.csv' not found. Please create the file.")
+    df = pd.DataFrame()
+
+if not df.empty:
+    # --- 3. Build the Graph ---
+    G = nx.from_pandas_edgelist(df, 'source', 'target')
+    print("\nGraph created successfully.")
+    print(f"Number of nodes (routers): {G.number_of_nodes()}")
+    print(f"Number of edges (connections): {G.number_of_edges()}")
+
+    # --- 4. Visualize the Network ---
+    plt.figure(figsize=(10, 8))
+    pos = nx.spring_layout(G, k=0.9, iterations=50)
+    # Draw the nodes and edges
+    nx.draw(G, pos, with_labels=True, node_color='skyblue', node_size=2000,
+    edge_color='gray', font_size=12, font_weight='bold')
+
+    plt.title("Network Routing Diagram", size=16)
+    print("\nDisplaying the network diagram...")
+    plt.show()
+else:
+    print("\nCould not generate diagram due to missing data.")
+print("\n--- Network Diagram Practical Complete ---")
+
+
+
+5.3))))Write a python/R program to build acyclic graph  
+# Input:
+# pip install networkx
+# pip3 install networkx
+# -m pip intall networkx
+# -m pip show networkx
+
+import pandas as pd
+import networkx as nx
+import matplotlib.pyplot as plt
+print("--- Practical 3: Acyclic Graph Construction ---")
+# --- 2. Load Data ---
+try:
+    df = pd.read_csv('sample3.csv')
+    print("Loaded Graph Edge Data:")
+    print(df)
+except FileNotFoundError:
+    print("Error: 'sample3.csv' not found. Please create the file.")
+    df = pd.DataFrame()
+if not df.empty:
+    # --- 3. Build a Directed Graph ---
+    G = nx.from_pandas_edgelist(df, 'source', 'target', create_using=nx.DiGraph())
+    print("\nDirected graph created successfully.")
+    # --- 4. Check for Cycles ---
+    is_acyclic = nx.is_directed_acyclic_graph(G)
+    print(f"\nIs the graph acyclic? {is_acyclic}")
+    if not is_acyclic:
+        try:
+            cycles = list(nx.simple_cycles(G))
+            print("Cycles found in the graph:")
+            for i, cycle in enumerate(cycles, 1):
+                print(f"  Cycle {i}: {' -> '.join(cycle)} -> {cycle[0]}")
+        except Exception as e:
+            print(f"Could not find cycles due to an error: {e}")
+    else:
+        print("No cycles were found. The graph is a DAG.")
+    # --- 5. Visualize the Graph ---
+    plt.figure(figsize=(10, 8))
+    pos = nx.spring_layout(G, seed=42)
+    nx.draw(G, pos, with_labels=True, node_color='lightgreen', node_size=2500,
+            font_size=12, font_weight='bold', arrows=True, arrowstyle='->')
+    plt.title("Directed Graph Visualization", size=16)
+    print("\nDisplaying graph...")
+    plt.show()
+else:
+    print("\nCould not build graph due to missing data.")
+print("\n--- Acyclic Graph Practical Complete ---")
+
+
+5.4)))Write python/R program to pick the content for BillBoards from the given data   
+# Input:
+# pip install pandas
+
+import pandas as pd
+print("--- Practical 4: Billboard Content Selection ---")
+# --- 2. Load Data ---
+try:
+    df = pd.read_csv('sample4.csv')
+    print("Available Billboard Ads Data:")
+    print(df)
+except FileNotFoundError:
+    print("Error: 'sample4.csv' not found. Please create it.")
+    df = pd.DataFrame()
+if not df.empty:
+    # --- 3. Content Selection Logic ---
+    BUDGET = 50000
+    print(f"\nTotal Budget for Billboards: ${BUDGET:,.2f}")
+    df['reach_per_dollar'] = df['expected_reach'] / df['cost']
+    # Sort ads by their value in descending order
+    df_sorted = df.sort_values(by='reach_per_dollar', ascending=False)
+    print("\nAds sorted by 'Reach per Dollar':")
+    print(df_sorted)
+    # Select ads greedily
+    selected_ads = []
+    current_cost = 0
+    total_reach = 0
+    for index, ad in df_sorted.iterrows():
+        if current_cost + ad['cost'] <= BUDGET:
+            selected_ads.append(ad)
+            current_cost += ad['cost']
+            total_reach += ad['expected_reach']
+    # --- 4. Display Results ---
+    print("\n--- Billboard Content Plan ---")
+    if selected_ads:
+        selected_df = pd.DataFrame(selected_ads)
+        print("Selected Ads for Billboards:")
+        print(selected_df[['ad_id', 'content', 'cost', 'expected_reach']])
+        print("\n--- Summary ---")
+        print(f"Total Cost: ${current_cost:,.2f}")
+        print(f"Total Expected Reach: {total_reach:,.0f} impressions")
+    else:
+        print("No ads could be selected within the budget.")
+else:
+    print("\nCould not perform selection due to missing data.")
+print("\n--- Billboard Selection Practical Complete ---")
+
+
+5.5)))Write a python/R program to generate GML file from given csv file   
+# Input:
+# pip install networkx
+# pip3 install networkx
+# -m pip intall networkx
+# -m pip show networkx
+
+import pandas as pd
+import networkx as nx
+print("--- Practical 5: CSV to GML File Generation ---")
+# --- 2. Load Data ---
+try:
+    df = pd.read_csv('sample5.csv')
+    print("Loaded Network Data from CSV:")
+    print(df)
+except FileNotFoundError:
+    print("Error: 'sample5.csv' not found. Please create the file.")
+    df = pd.DataFrame()
+if not df.empty:
+
+    # --- 3. Build the Graph ---
+    G = nx.from_pandas_edgelist(
+        df,
+        'source',
+        'target',
+        edge_attr=['relationship', 'weight'], # Specify columns to be edge attributes
+        create_using=nx.DiGraph() # Create a directed graph
+    )
+    print("\nGraph built successfully from CSV data.")
+    print(f"Nodes: {G.number_of_nodes()}, Edges: {G.number_of_edges()}")
+
+    # --- 4. Export to GML ---
+    output_filename = 'output_graph.gml'
+    try:
+        nx.write_gml(G, output_filename)
+        print(f"\nSuccessfully exported the graph to '{output_filename}'")
+        print("You can open this file in a text editor or graph software like Gephi.")
+    except Exception as e:
+        print(f"\nError exporting to GML: {e}")
+else:
+    print("\nCould not generate GML file due to missing data.")
+print("\n--- GML Generation Practical Complete ---")
+
+
+5.6))) Write a python/R program to generate GML file from given csv file   
+# Input:
+# pip install networkx
+# pip3 install networkx
+# -m pip intall networkx
+# -m pip show networkx
+
+import pandas as pd
+import networkx as nx
+print("--- Practical 5: CSV to GML File Generation ---")
+# --- 2. Load Data ---
+try:
+    df = pd.read_csv('sample5.csv')
+    print("Loaded Network Data from CSV:")
+    print(df)
+except FileNotFoundError:
+    print("Error: 'sample5.csv' not found. Please create the file.")
+    df = pd.DataFrame()
+if not df.empty:
+
+    # --- 3. Build the Graph ---
+    G = nx.from_pandas_edgelist(
+        df,
+        'source',
+        'target',
+        edge_attr=['relationship', 'weight'], # Specify columns to be edge attributes
+        create_using=nx.DiGraph() # Create a directed graph
+    )
+    print("\nGraph built successfully from CSV data.")
+    print(f"Nodes: {G.number_of_nodes()}, Edges: {G.number_of_edges()}")
+
+    # --- 4. Export to GML ---
+    output_filename = 'output_graph.gml'
+    try:
+        nx.write_gml(G, output_filename)
+        print(f"\nSuccessfully exported the graph to '{output_filename}'")
+        print("You can open this file in a text editor or graph software like Gephi.")
+    except Exception as e:
+        print(f"\nError exporting to GML: {e}")
+else:
+    print("\nCould not generate GML file due to missing data.")
+print("\n--- GML Generation Practical Complete ---")
+
+
+5.7))) Write python/R program using data science via clustering to determine new warehouse using the given data  
+# Input:
+# pip install seaborn 
+# pip install pandas
+# pip install matplotlib
+
+import pandas as pd
+from sklearn.cluster import KMeans
+import matplotlib.pyplot as plt
+import seaborn as sns
+print("--- Practical 7: Warehouse Location Planning via Clustering ---")
+
+# --- 2. Load Data ---
+try:
+    df = pd.read_csv('sample7.csv')
+    print("Loaded Customer Locations Data:")
+    print(df.head())
+except FileNotFoundError:
+    print("Error: 'sample7.csv' not found. Please create the file.")
+    df = pd.DataFrame()
+if not df.empty and all(col in df.columns for col in ['latitude', 'longitude']):
+    # --- 3. Perform K-Means Clustering ---
+    N_WAREHOUSES = 4
+    print(f"\nPlanning for {N_WAREHOUSES} new warehouse locations.")
+    kmeans = KMeans(n_clusters=N_WAREHOUSES, random_state=42, n_init=10)
+    customer_coords = df[['latitude', 'longitude']]
+    # Fit the model and assign each customer to a cluster
+    df['cluster'] = kmeans.fit_predict(customer_coords)
+    # The cluster centroids are our proposed warehouse locations.
+    warehouse_locations = kmeans.cluster_centers_
+    print("\nClustering complete.")
+    print("\nProposed New Warehouse Locations (Latitude, Longitude):")
+    for i, loc in enumerate(warehouse_locations):
+        print(f"  Warehouse {i+1}: Latitude={loc[0]:.4f}, Longitude={loc[1]:.4f}")
+    # --- 4. Visualize the Results --
+    plt.figure(figsize=(12, 9))
+    # Create a scatter plot of customers, colored by their assigned cluster.
+    sns.scatterplot(
+        x='longitude', y='latitude', hue='cluster', data=df,
+        palette='viridis', alpha=0.7, s=50, legend='full'
+    )
+    # Plot the calculated centroids as large red 'X's.
+    plt.scatter(
+        warehouse_locations[:, 1], warehouse_locations[:, 0],
+        s=400, c='red', marker='X', label='Proposed Warehouses'
+    )
+    plt.title('Customer Clusters and Proposed Warehouse Locations', size=16)
+    plt.xlabel('Longitude', size=12)
+    plt.ylabel('Latitude', size=12)
+    plt.legend(title='Customer Cluster')
+    plt.grid(True)
+    print("\nDisplaying visualization of customer clusters and warehouse sites...")
+    plt.show()
+else:
+    print("\nCould not perform clustering due to missing or invalid data.")
+print("\n--- Warehouse Location Practical Complete ")
+
+
+
+5.8))) Using the given data Write python/R program to plan the shipping routers from best-fit international logistics.
+
+# Input:
+# pip install pandas
+# pip install matplotlib
+# pip install networkx
+# pip3 install networkx               #optional
+
+import pandas as pd
+import networkx as nx
+import matplotlib.pyplot as plt
+# Use Dijkstra's algorithm to find the shortest path.
+print("--- Practical 8: Shipping Route Planner ---")
+
+# --- 2. Load Data ---
+try:
+    df = pd.read_csv('sample8.csv')
+    print("Loaded Logistics Routes Data:")
+    print(df)
+except FileNotFoundError:
+    print("Error: 'sample8.csv' not found. Please create the file.")
+    df = pd.DataFrame()
+if not df.empty:
+    # --- 3. Build the Logistics Network Graph ---
+    G = nx.from_pandas_edgelist(df, 'source', 'target', edge_attr='cost', create_using=nx.Graph())
+    print("\nLogistics network graph created.")
+
+    # --- 4. Find the Best Route ---
+    start_node = 'Mumbai'
+    end_node = 'New York'
+    try:
+        # Use Dijkstra's algorithm to find the shortest path
+        path = nx.dijkstra_path(G, source=start_node, target=end_node, weight='cost')
+        cost = nx.dijkstra_path_length(G, source=start_node, target=end_node, weight='cost')
+        print(f"\n--- Best Route Plan from {start_node} to {end_node} ---")
+        print(f"Path: {' -> '.join(path)}")
+        print(f"Total Cost: {cost}")
+
+        # --- 5. Visualize the Route ---
+        plt.figure(figsize=(12, 8))
+        pos = nx.spring_layout(G, k=0.8, seed=42)
+
+        # Draw the full network
+        nx.draw(G, pos, with_labels=True, node_color='skyblue', node_size=2000, font_size=10)
+
+        # Highlight the nodes and edges in the best path
+        path_edges = list(zip(path, path[1:]))
+        nx.draw_networkx_nodes(G, pos, nodelist=path, node_color='lightgreen', node_size=2500)
+        nx.draw_networkx_edges(G, pos, edgelist=path_edges, edge_color='red', width=2)
+
+        # Draw edge labels (costs)
+        edge_labels = nx.get_edge_attributes(G, 'cost')
+        nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels)
+
+        plt.title(f"Optimal Shipping Route: {start_node} to {end_node}", size=16)
+        plt.show()
+
+    except nx.NetworkXNoPath:
+        print(f"\nNo path could be found between {start_node} and {end_node}.")
+    except nx.NodeNotFound as e:
+        print(f"\nError: {e}. Check if nodes are in the data file.")
+else:
+    print("\nCould not plan routes due to missing data.")
+print("\n--- Shipping Route Planner Practical Complete ---")
+
+
+5.9)))Write python/R program to delete the best packing option to ship in container from the given data.
+# Input:
+# pip install pandas
+
+import pandas as pd
+print("--- Practical 9: Container Packing Optimizer ---")
+# --- 2. Load Data and Define Constraints ---
+CONTAINER_VOLUME_CAPACITY = 25.0  # in cubic meters
+try:
+    df = pd.read_csv('sample9.csv')
+    print("Available Items for Shipping:")
+    print(df)
+except FileNotFoundError:
+    print("Error: 'sample9.csv' not found. Please create the file.")
+    df = pd.DataFrame()
+if not df.empty:
+    # --- 3. Optimization Logic (Greedy Approach) ---
+    df['value_density'] = df['value'] / df['volume']
+    df_sorted = df.sort_values(by='value_density', ascending=False)
+    print("\nItems sorted by value density:")
+    print(df_sorted)
+    packed_items_indices = []
+    remaining_volume = CONTAINER_VOLUME_CAPACITY
+    for index, item in df_sorted.iterrows():
+        if item['volume'] <= remaining_volume:
+            packed_items_indices.append(index)
+            remaining_volume -= item['volume']
+    # --- 4. Display Results ---
+    best_packing_option = df.loc[packed_items_indices]
+    remaining_items = df.drop(packed_items_indices)
+    print(f"\n--- Best Packing Option for Container (Capacity: {CONTAINER_VOLUME_CAPACITY} m³) ---")
+    if not best_packing_option.empty:
+        print(best_packing_option[['item_id', 'item_name', 'value', 'volume']])
+        print("\n--- Summary of Best Option ---")
+        print(f"Total Packed Value: ${best_packing_option['value'].sum():,.2f}")
+        print(f"Total Packed Volume: {best_packing_option['volume'].sum():.2f} m³")
+        print(f"Volume Used: {(best_packing_option['volume'].sum() /CONTAINER_VOLUME_CAPACITY) * 100:.2f}%")
+    else:
+        print("No items could be packed.")
+    # This step fulfills the "delete the best packing option" requirement
+    print("\n--- Remaining Items Not Packed ---")
+    if not remaining_items.empty:
+        print(remaining_items[['item_id', 'item_name', 'value', 'volume']])
+    else:
+        print("All items were packed.")
+else:
+    print("\nCould not perform optimization due to missing data.")
+print("\n--- Container Packing Practical Complete ---")
+
+
+5.10))) Write python program to create delivery route using the given data  
+# Input:
+# pip install pandas
+# pip install networkx
+# pip3 install networkx               #optional
+# pip install matplotlib
+
+import pandas as pd
+import networkx as nx
+from itertools import permutations
+import matplotlib.pyplot as plt
+import math
+print("--- Practical 10: Delivery Route Creation (TSP) ---")
+# --- 2. Load Data ---
+try:
+    df = pd.read_csv('sample10.csv')
+    print("Delivery Locations:")
+    print(df)
+except FileNotFoundError:
+    print("Error: 'sample10.csv' not found. Please create the file.")
+    df = pd.DataFrame()
+# Function to calculate Euclidean distance between two points
+def calculate_distance(p1, p2):
+    return math.sqrt((p1['longitude'] - p2['longitude'])**2 + (p1['latitude'] - p2['latitude'])**2)
+if not df.empty:
+    # --- 3. Build a Complete Graph ---
+    G = nx.Graph()
+    locations = {row['location_id']: {'lat': row['latitude'], 'lon': row['longitude']} for index, row in df.iterrows()}
+    depot = 'Depot'
+    other_locations = [loc for loc in df['location_id'] if loc != depot]
+    if len(other_locations) > 8:
+         print("\nWarning: Too many locations for brute-force. Consider a heuristic approach for >9 stops.")
+    shortest_path = None
+    min_distance = float('inf')
+    # Generate all possible routes (permutations)
+    for p in permutations(other_locations):
+        current_route = [depot] + list(p) + [depot]
+        current_distance = 0
+        for i in range(len(current_route) - 1):
+            loc1_id = current_route[i]
+            loc2_id = current_route[i+1]
+            point1 = {'latitude': locations[loc1_id]['lat'], 'longitude': locations[loc1_id]['lon']}
+            point2 = {'latitude': locations[loc2_id]['lat'], 'longitude': locations[loc2_id]['lon']}
+            current_distance += calculate_distance(point1, point2)
+        if current_distance < min_distance:
+            min_distance = current_distance
+            shortest_path = current_route
+    # --- 4. Display the Optimal Route ---
+    print("\n--- Optimal Delivery Route ---")
+    print(f"Route: {' -> '.join(shortest_path)}")
+    print(f"Total Distance: {min_distance:.2f} (in coordinate units)")
+   # --- 5. Visualize the Route ---
+    plt.figure(figsize=(10, 8))
+    pos = {row['location_id']: (row['longitude'], row['latitude']) for index, row in df.iterrows()}
+    nx.draw(G, pos, with_labels=True, node_color='lightblue', node_size=1500, labels={n:n for n in pos})
+    path_edges = list(zip(shortest_path, shortest_path[1:]))
+    nx.draw_networkx_nodes(G, pos, nodelist=df['location_id'], node_color='lightblue')
+    nx.draw_networkx_labels(G, pos, labels={n:n for n in pos})
+    nx.draw_networkx_edges(G, pos, edgelist=path_edges, edge_color='green', width=2, arrows=True, arrowsize=20)
+    plt.title("Optimal Delivery Route", size=16)
+    plt.xlabel("Longitude")
+    plt.ylabel("Latitude")
+    plt.show()
+else:
+    print("\nCould not create route due to missing data.")
+print("\n--- Delivery Route Practical Complete ---")
+
+
+5.11)))Write python program to create simple forex trading planner from the given data  
+# Input:
+# pip install pandas
+# pip install matplotlib
+
+import pandas as pd
+import matplotlib.pyplot as plt
+print("--- Practical 11: Simple Forex Trading Planner ---")
+# --- 2. Load and Prepare Data ---
+try:
+    df = pd.read_csv('sample11.csv', index_col='Date', parse_dates=True)
+    print("Loaded EUR/USD Forex Data:")
+    print(df.head())
+except FileNotFoundError:
+    print("Error: 'sample11.csv' not found. Please create the file.")
+    df = pd.DataFrame()
+if not df.empty:
+    # --- 3. Calculate Moving Averages (MA) ---
+    SHORT_WINDOW = 20  # 20-day short-term MA
+    LONG_WINDOW = 50   # 50-day long-term MA
+    df['Short_MA'] = df['Close'].rolling(window=SHORT_WINDOW, min_periods=1).mean()
+    df['Long_MA'] = df['Close'].rolling(window=LONG_WINDOW, min_periods=1).mean()
+
+    # --- 4. Generate Trading Signals ---
+    # Create a 'Signal' column: 1 for buy, -1 for sell, 0 for hold
+    df['Signal'] = 0
+    # A signal is generated when Short_MA crosses Long_MA
+    df.loc[df['Short_MA'] > df['Long_MA'], 'Signal'] = 1
+    df.loc[df['Short_MA'] < df['Long_MA'], 'Signal'] = -1
+    # Find the exact crossover points
+    df['Position'] = df['Signal'].diff()
+    # --- 5. Display Trading Plan ---
+    print("\n--- Trading Signals ---")
+    print("1 = BUY, -1 = SELL")
+    signals = df[df['Position'] != 0]
+    print(signals[['Close', 'Short_MA', 'Long_MA', 'Position']].tail(10))
+
+    # --- 6. Visualize the Strategy ---
+    plt.figure(figsize=(14, 8))
+    plt.plot(df['Close'], label='EUR/USD Close Price', alpha=0.5)
+    plt.plot(df['Short_MA'], label=f'{SHORT_WINDOW}-Day MA', color='green')
+    plt.plot(df['Long_MA'], label=f'{LONG_WINDOW}-Day MA', color='red')
+    # Plot Buy signals (Golden Cross)
+    plt.plot(df[df['Position'] == 2].index,
+             df['Short_MA'][df['Position'] == 2],
+             '^', markersize=12, color='blue', label='Buy Signal')
+    # Plot Sell signals (Death Cross)
+    plt.plot(df[df['Position'] == -2].index,
+             df['Short_MA'][df['Position'] == -2],
+             'v', markersize=12, color='purple', label='Sell Signal')
+    plt.title('Forex Trading Planner: EUR/USD Moving Average Crossover', size=16)
+    plt.xlabel('Date', size=12)
+    plt.ylabel('Price', size=12)
+    plt.legend()
+    plt.grid(True)
+    plt.show()
+else:
+    print("\nCould not generate plan due to missing data.")
+print("\n--- Forex Planner Practical Complete ---")
+
+
+5.12))) Write python program to process the balance sheet to ensure the only good data is processing.
+# Input:
+# pip install pandas
+# pip install numpy
+
+import pandas as pd
+import numpy as np
+print("--- Practical 12: Balance Sheet Data Cleaning ---")
+
+# --- 2. Load Messy Data ---
+try:
+    df = pd.read_csv('sample12.csv')
+    print("--- Original Messy Data ---")
+    print(df)
+    print("\nOriginal Data Types:")
+    print(df.dtypes)
+except FileNotFoundError:
+    print("Error: 'sample12.csv' not found. Please create the file.")
+    df = pd.DataFrame()
+if not df.empty:
+    df_cleaned = df.copy()
+
+    # --- 3. Data Cleaning Process ---
+    print("\n--- Starting Cleaning Process ---")
+    # a Correct Data Types
+    financial_cols = ['Total Assets', 'Total Liabilities', 'Shareholders Equity']
+    for col in financial_cols:
+        # pd.to_numeric will convert numbers, and 'coerce' turns non-numbers into NaN
+        df_cleaned[col] = pd.to_numeric(df_cleaned[col], errors='coerce')
+    print("Step 1: Converted financial columns to numeric types.")
+    # b Handle Missing Values (NaN)
+    # For financial data, replacing with 0 is often a safe starting point.
+    df_cleaned[financial_cols] = df_cleaned[financial_cols].fillna(0)
+    print("Step 2: Filled missing numerical values with 0.")
+    # --- 4. Data Validation ---
+    # Check if the fundamental accounting equation holds true.
+    # We use np.isclose for safe floating-point comparison.
+    df_cleaned['Calculated Equity'] = df_cleaned['Total Assets'] - df_cleaned['Total Liabilities']
+    df_cleaned['Is Balanced'] = np.isclose(df_cleaned['Calculated Equity'], df_cleaned['Shareholders Equity'])
+    print("Step 3: Performed validation (Assets = Liabilities + Equity).")
+
+    # --- 5. Display Cleaned and Validated Data ---
+    print("\n--- Cleaned and Processed Balance Sheet ---")
+    final_cols = ['Company', 'Year'] + financial_cols + ['Is Balanced']
+    print(df_cleaned[final_cols])
+    unbalanced = df_cleaned[df_cleaned['Is Balanced'] == False]
+    if not unbalanced.empty:
+        print("\n--- Warning: Unbalanced Entries Found! ---")
+        print(unbalanced[final_cols])
+    else:
+        print("\nSuccess: All entries are balanced.")
+else:
+    print("\nCould not process data file.")
+print("\n--- Balance Sheet Processing Practical Complete ---"
+)    
+
+
+5.13)))Write python program to generate payroll from the given data.
+# Input:
+# pip install pandas
+
+import pandas as pd
+print("--- Practical 13: Payroll Generator ---")
+# --- 2. Load Employee Data ---
+try:
+    df = pd.read_csv('sample13.csv')
+    print("--- Input Employee Data ---")
+    print(df)
+except FileNotFoundError:
+    print("Error: 'sample13.csv' not found. Please create the file.")
+    df = pd.DataFrame()
+if not df.empty:
+    # --- 3. Perform Payroll Calculations ---
+    # a Calculate Gross Pay
+    # Handle potential overtime (hours > 40) with a 1.5x pay rate.
+    def calculate_gross_pay(row):
+        regular_hours = min(row['hours_worked'], 40)
+        overtime_hours = max(row['hours_worked'] - 40, 0)
+        regular_pay = regular_hours * row['hourly_rate']
+        overtime_pay = overtime_hours * row['hourly_rate'] * 1.5
+        return regular_pay + overtime_pay
+    df['gross_pay'] = df.apply(calculate_gross_pay, axis=1)
+    # b Calculate Tax Deduction
+    df['tax_deduction'] = df['gross_pay'] * df['tax_rate_percent'] / 100
+    # c Calculate Net Pay
+    df['net_pay'] = df['gross_pay'] - df['tax_deduction']
+    # --- 4. Generate and Display Payroll Report ---
+    print("\n--- Generated Payroll Report ---")
+    # Format currency columns for better readability
+    currency_cols = ['hourly_rate', 'gross_pay', 'tax_deduction', 'net_pay']
+    report_df = df.copy()
+    for col in currency_cols:
+        report_df[col] = report_df[col].map('${:,.2f}'.format)
+    print(report_df)
+    # --- 5. Export to CSV ---
+    output_filename = 'payroll_report.csv'
+    try:
+        df.to_csv(output_filename, index=False)
+        print(f"\nPayroll report successfully saved to '{output_filename}'")
+    except Exception as e:
+        print(f"\nError saving report: {e}")
+else:
+    print("\nCould not generate payroll due to missing data.")
+print("\n--- Payroll Generation Practical Complete ---")
