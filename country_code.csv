@@ -1,3 +1,4 @@
+rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 Practical 1:  Creating Data Model using Cassandra.
 
@@ -905,3 +906,4 @@ if not df.empty:
 else:
     print("\nCould not generate payroll due to missing data.")
 print("\n--- Payroll Generation Practical Complete ---")
+
